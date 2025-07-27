@@ -1,0 +1,6 @@
+startup-time:
+  week-day: 7
+  time: "19:30" #format is H:mm
+  time-zone: "" # can be null
+
+event-world: "world-name"

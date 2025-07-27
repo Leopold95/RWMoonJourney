@@ -1,0 +1,21 @@
+name: RWMoonJourney
+version: '${version}'
+main: com.reallyworld.rwmoonjourney.RWMoonJourney
+api-version: '1.16'
+
+commands:
+  moonjourney:
+    aliases:
+      - rwmj
+      - mj
+    usage: /moonjourney <subcommand> [args]
+
+permissions:
+  moonjourney.start:
+    description: ""
+    default: op
+  moonjourney.stop:
+    description: ""
+    default: op
+
+
