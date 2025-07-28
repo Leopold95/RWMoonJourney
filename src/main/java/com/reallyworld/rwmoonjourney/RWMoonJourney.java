@@ -2,10 +2,12 @@ package com.reallyworld.rwmoonjourney;
 
 import com.reallyworld.rwmoonjourney.commands.CommandBase;
 import com.reallyworld.rwmoonjourney.commands.CommandBaseCompleter;
+import com.reallyworld.rwmoonjourney.configs.ChestsConfig;
 import com.reallyworld.rwmoonjourney.configs.Config;
 import com.reallyworld.rwmoonjourney.configs.Messages;
 import com.reallyworld.rwmoonjourney.constants.Commands;
 import com.reallyworld.rwmoonjourney.core.BreathManager;
+import com.reallyworld.rwmoonjourney.core.EventChestManager;
 import com.reallyworld.rwmoonjourney.core.EventManager;
 import com.reallyworld.rwmoonjourney.core.EventTimerService;
 import com.reallyworld.rwmoonjourney.listeners.PlayerJoinListener;
@@ -18,6 +20,7 @@ public final class RWMoonJourney extends JavaPlugin {
 
     public EventManager eventManager;
     public BreathManager breathManager;
+    public EventChestManager eventChestManager;
     private EventTimerService eventTimer;
 
     //di
@@ -29,6 +32,7 @@ public final class RWMoonJourney extends JavaPlugin {
 
         Config.init(this, "config.yml");
         Messages.init(this, "messages.yml");
+        ChestsConfig.init(this, "chests.yml");
 
         if (!setupEconomy() ) {
             getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
@@ -36,10 +40,11 @@ public final class RWMoonJourney extends JavaPlugin {
             return;
         }
 
+        eventChestManager = new EventChestManager();
         breathManager = new BreathManager();
         eventManager = new EventManager(this, getLogger(), economy, breathManager);
         eventTimer = new EventTimerService(eventManager, plugin, getLogger());
-        eventTimer.starTimer();
+        eventTimer.startTimer();
 
         registerCommands();
         registerListeners();
@@ -51,7 +56,7 @@ public final class RWMoonJourney extends JavaPlugin {
     }
 
     private void registerCommands(){
-        getCommand(Commands.Base).setExecutor(new CommandBase(eventManager));
+        getCommand(Commands.Base).setExecutor(new CommandBase(eventManager, eventChestManager));
         getCommand(Commands.Base).setTabCompleter(new CommandBaseCompleter());
     }
 

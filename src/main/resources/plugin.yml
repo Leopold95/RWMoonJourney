@@ -25,5 +25,14 @@ permissions:
   moonjourney.time:
     description: ""
     default: op
+  moonjourney.buybreath:
+    description: ""
+    default: op
+  moonjourney.addchest:
+    description: ""
+    default: op
+  moonjourney.spawnchests:
+    description: ""
+    default: op
 
 

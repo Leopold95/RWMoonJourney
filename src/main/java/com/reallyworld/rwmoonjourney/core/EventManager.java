@@ -4,6 +4,8 @@ import com.reallyworld.rwmoonjourney.configs.Config;
 import com.reallyworld.rwmoonjourney.configs.Messages;
 import com.reallyworld.rwmoonjourney.constants.Commands;
 import com.reallyworld.rwmoonjourney.constants.Permissions;
+import com.reallyworld.rwmoonjourney.utils.TimeUtils;
+import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
@@ -63,7 +65,7 @@ public class EventManager {
 
         EconomyResponse resp = economy.withdrawPlayer(player, eventCost);
         if(!resp.transactionSuccess()){
-            player.sendMessage(Messages.text("event.no-money"));
+            player.sendMessage(Messages.text("event.no-money-join"));
             return;
         }
 
@@ -85,7 +87,31 @@ public class EventManager {
     }
 
     public void time(@NotNull Player player){
+        long timeToStart = TimeUtils.secondsUntil(
+                Config.getInt("startup-time.week-day"),
+                Config.getString("startup-time.time"),
+                Config.getString("startup-time.time-zone")
+        );
 
+        String message = Messages.getString("event.time")
+                .replace("{time}", TimeUtils.secondsToTime(timeToStart));
+        player.sendMessage(Component.text(message));
+    }
+
+    public void buyBreath(@NotNull Player player){
+        if(breathManager.has(player)){
+            player.sendMessage(Messages.text("event.breath.already-has"));
+            return;
+        }
+
+        int breathCost = Config.getInt("event-breath.cost");
+        EconomyResponse resp = economy.withdrawPlayer(player, breathCost);
+        if(resp.transactionSuccess()){
+            player.sendMessage(Messages.text("event.breath.no-money"));
+            return;
+        }
+
+        breathManager.addBreath(player);
     }
 
     private void eventLoop(){

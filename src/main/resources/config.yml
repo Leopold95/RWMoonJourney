@@ -4,5 +4,8 @@ startup-time:
   time-zone: "" # can be null
 
 event-join-cost: 20000
+event-breath:
+  cost: 1000
+  time-mm: 10
 breath-damage: 1.5
-event-world: "world-name"
+event-world: "world"

@@ -1,6 +1,7 @@
 package com.reallyworld.rwmoonjourney.core;
 
 import com.reallyworld.rwmoonjourney.configs.Config;
+import com.reallyworld.rwmoonjourney.configs.Messages;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
@@ -8,10 +9,15 @@ import org.jetbrains.annotations.NotNull;
 public class BreathManager {
     public void addBreath(@NotNull Player player){
         player.getPersistentDataContainer().set(Keys.HAS_BREATH, PersistentDataType.INTEGER, 1);
+        player.sendMessage(Messages.text("event.breath.got"));
     }
 
     public void removeBreath(@NotNull Player player){
         player.getPersistentDataContainer().remove(Keys.HAS_BREATH);
+    }
+
+    public boolean has(@NotNull Player player){
+        return player.getPersistentDataContainer().has(Keys.HAS_BREATH, PersistentDataType.INTEGER);
     }
 
     public void tryDamage(@NotNull Player player){

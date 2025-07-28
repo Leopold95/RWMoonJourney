@@ -1,8 +1,10 @@
 package com.reallyworld.rwmoonjourney.commands;
 
+import com.reallyworld.rwmoonjourney.configs.ChestsConfig;
 import com.reallyworld.rwmoonjourney.configs.Messages;
 import com.reallyworld.rwmoonjourney.constants.Commands;
 import com.reallyworld.rwmoonjourney.constants.Permissions;
+import com.reallyworld.rwmoonjourney.core.EventChestManager;
 import com.reallyworld.rwmoonjourney.core.EventManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,9 +14,14 @@ import org.jetbrains.annotations.NotNull;
 
 public class CommandBase implements CommandExecutor {
     private final EventManager eventManager;
+    private final EventChestManager eventChestManager;
 
-    public CommandBase(EventManager eventManager){
+    public CommandBase(
+            @NotNull EventManager eventManager,
+            @NotNull EventChestManager eventChestManager
+    ){
         this.eventManager = eventManager;
+        this.eventChestManager = eventChestManager;
     }
 
     @Override
@@ -32,6 +39,7 @@ public class CommandBase implements CommandExecutor {
                 }
 
                 eventManager.start();
+                break;
             }
 
             case Commands.StopEvent:{
@@ -41,6 +49,7 @@ public class CommandBase implements CommandExecutor {
                 }
 
                 eventManager.stop();
+                break;
             }
 
             case Commands.Join:{
@@ -55,6 +64,7 @@ public class CommandBase implements CommandExecutor {
                 }
 
                 eventManager.join((Player) sender);
+                break;
             }
 
             case Commands.Time:{
@@ -69,6 +79,58 @@ public class CommandBase implements CommandExecutor {
                 }
 
                 eventManager.time((Player) sender);
+                break;
+            }
+
+            case Commands.BuyBreath:{
+                if(!(sender instanceof Player)){
+                    sender.sendMessage(Messages.playerOnly());
+                    return true;
+                }
+
+                if(!sender.hasPermission(Permissions.CommandMJBuyBreath)){
+                    sender.sendMessage(Messages.noPerm());
+                    return true;
+                }
+
+                eventManager.buyBreath((Player) sender);
+                break;
+            }
+
+            case Commands.AddChest:{
+                if(!(sender instanceof Player)){
+                    sender.sendMessage(Messages.playerOnly());
+                    return true;
+                }
+
+                if(!sender.hasPermission(Permissions.CommandMJAddChest)){
+                    sender.sendMessage(Messages.noPerm());
+                    return true;
+                }
+
+                if(args.length < 2) {
+                    sender.sendMessage(Messages.badArgs());
+                    return true;
+                }
+
+                ChestsConfig.addChest(args[1], ((Player) sender).getLocation());
+                sender.sendMessage(Messages.text("event.add-chest.done"));
+                break;
+            }
+
+            case Commands.SpawnChests:{
+                if(!(sender instanceof Player)){
+                    sender.sendMessage(Messages.playerOnly());
+                    return true;
+                }
+
+                if(!sender.hasPermission(Permissions.CommandMJASpawnChests)){
+                    sender.sendMessage(Messages.noPerm());
+                    return true;
+                }
+
+                eventChestManager.spawn();
+                break;
             }
         }
 
