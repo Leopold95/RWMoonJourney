@@ -67,10 +67,7 @@ public class ConfigBase {
         return random.nextInt(value2 - value1) + value1;
     }
 
-    public static double getDouble(String path) throws BadConfigValueException {
-        if (!config.isSet(path)) {
-            throw new BadConfigValueException(path);
-        }
+    public static double getDouble(String path) {
         return config.getDouble(path);
     }
 

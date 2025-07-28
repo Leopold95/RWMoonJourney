@@ -19,4 +19,5 @@ public class Messages extends ConfigBase {
     public static Component badArgs(){
         return getText("bad-args");
     }
+    public static Component playerOnly(){ return getText("player-only");}
 }

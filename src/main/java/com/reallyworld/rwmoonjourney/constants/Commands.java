@@ -4,4 +4,6 @@ public class Commands {
     public static final String Base = "moonjourney";
     public static final String StartEvent = "start";
     public static final String StopEvent = "stop";
+    public static final String Join = "join";
+    public static final String Time = "time";
 }

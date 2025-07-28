@@ -2,6 +2,8 @@ name: RWMoonJourney
 version: '${version}'
 main: com.reallyworld.rwmoonjourney.RWMoonJourney
 api-version: '1.16'
+depend:
+  - Vault
 
 commands:
   moonjourney:
@@ -15,6 +17,12 @@ permissions:
     description: ""
     default: op
   moonjourney.stop:
+    description: ""
+    default: op
+  moonjourney.join:
+    description: ""
+    default: op
+  moonjourney.time:
     description: ""
     default: op
 

@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class CommandBaseCompleter implements TabCompleter {
@@ -17,6 +16,8 @@ public class CommandBaseCompleter implements TabCompleter {
         ArrayList<String> base = new ArrayList<>();
         base.add(Commands.StartEvent);
         base.add(Commands.StopEvent);
+        base.add(Commands.Join);
+        base.add(Commands.Time);
         return base;
     }
 }

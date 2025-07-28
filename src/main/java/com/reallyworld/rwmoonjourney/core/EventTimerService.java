@@ -14,9 +14,9 @@ import java.util.logging.Logger;
  * Service for delayed event stating
  */
 public class EventTimerService {
-    private EventManager eventManager;
-    private Plugin plugin;
-    private Logger logger;
+    private final EventManager eventManager;
+    private final Plugin plugin;
+    private final Logger logger;
 
     public EventTimerService(EventManager eventManager, Plugin plugin, Logger logger){
         this.eventManager = eventManager;

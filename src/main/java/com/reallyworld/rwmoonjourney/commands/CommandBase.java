@@ -4,19 +4,14 @@ import com.reallyworld.rwmoonjourney.configs.Messages;
 import com.reallyworld.rwmoonjourney.constants.Commands;
 import com.reallyworld.rwmoonjourney.constants.Permissions;
 import com.reallyworld.rwmoonjourney.core.EventManager;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CommandBase implements CommandExecutor {
-    private EventManager eventManager;
+    private final EventManager eventManager;
 
     public CommandBase(EventManager eventManager){
         this.eventManager = eventManager;
@@ -46,6 +41,34 @@ public class CommandBase implements CommandExecutor {
                 }
 
                 eventManager.stop();
+            }
+
+            case Commands.Join:{
+                if(!(sender instanceof Player)){
+                    sender.sendMessage(Messages.playerOnly());
+                    return true;
+                }
+
+                if(!sender.hasPermission(Permissions.CommandMJJoin)){
+                    sender.sendMessage(Messages.noPerm());
+                    return true;
+                }
+
+                eventManager.join((Player) sender);
+            }
+
+            case Commands.Time:{
+                if(!(sender instanceof Player)){
+                    sender.sendMessage(Messages.playerOnly());
+                    return true;
+                }
+
+                if(!sender.hasPermission(Permissions.CommandMJTime)){
+                    sender.sendMessage(Messages.noPerm());
+                    return true;
+                }
+
+                eventManager.time((Player) sender);
             }
         }
 
