@@ -3,6 +3,7 @@ package com.reallyworld.rwmoonjourney.core;
 import com.reallyworld.rwmoonjourney.configs.Config;
 import com.reallyworld.rwmoonjourney.configs.Messages;
 import com.reallyworld.rwmoonjourney.utils.TimeUtils;
+import lombok.var;
 import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -106,8 +107,8 @@ public class EventService {
             return;
         }
 
-        int breathCost = Config.getInt("event-breath.cost");
-        EconomyResponse resp = economy.withdrawPlayer(player, breathCost);
+        var breathCost = Config.getInt("event-breath.cost");
+        var resp = economy.withdrawPlayer(player, breathCost);
         if(resp.transactionSuccess()){
             player.sendMessage(Messages.text("event.breath.no-money"));
             return;

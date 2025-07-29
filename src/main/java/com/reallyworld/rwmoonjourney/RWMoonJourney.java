@@ -10,6 +10,7 @@ import com.reallyworld.rwmoonjourney.core.WaterBreathServiceImpl;
 import com.reallyworld.rwmoonjourney.core.ChestService;
 import com.reallyworld.rwmoonjourney.core.EventService;
 import com.reallyworld.rwmoonjourney.core.EventTimerService;
+import com.reallyworld.rwmoonjourney.listeners.MobKillListener;
 import com.reallyworld.rwmoonjourney.listeners.PlayerJoinListener;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -63,6 +64,7 @@ public final class RWMoonJourney extends JavaPlugin {
     private void registerListeners(){
         getServer().getPluginManager().registerEvents(
                 new PlayerJoinListener(breathService, eventService), this);
+        getServer().getPluginManager().registerEvents(new MobKillListener(), this);
     }
 
     //of docks github code

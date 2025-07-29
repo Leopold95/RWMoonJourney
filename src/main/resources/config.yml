@@ -14,3 +14,6 @@ chest-rarity-list: #доступные редкости для сундуков,
   - rare:1000
   - default:6000
   - extra:9999
+
+event-mobs:
+  kill-money: 21.3

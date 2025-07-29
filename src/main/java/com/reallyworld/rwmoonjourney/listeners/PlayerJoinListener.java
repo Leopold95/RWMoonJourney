@@ -21,7 +21,6 @@ public class PlayerJoinListener implements Listener {
 
     @EventHandler
     private void onJoin(PlayerJoinEvent event){
-        breathService.remove(event.getPlayer());
         eventService.remove(event.getPlayer());
     }
 }
