@@ -80,10 +80,7 @@ public class Config extends ConfigBase {
         return config.getDouble(path, defaultValue);
     }
 
-    public static List<String> getStringList(String path) throws BadConfigValueException {
-        if (!config.isSet(path)) {
-            throw new BadConfigValueException(path);
-        }
+    public static List<String> getStringList(String path) {
         return config.getStringList(path);
     }
 

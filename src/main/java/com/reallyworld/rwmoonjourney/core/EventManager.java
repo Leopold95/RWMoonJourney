@@ -2,8 +2,6 @@ package com.reallyworld.rwmoonjourney.core;
 
 import com.reallyworld.rwmoonjourney.configs.Config;
 import com.reallyworld.rwmoonjourney.configs.Messages;
-import com.reallyworld.rwmoonjourney.constants.Commands;
-import com.reallyworld.rwmoonjourney.constants.Permissions;
 import com.reallyworld.rwmoonjourney.utils.TimeUtils;
 import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.Economy;
@@ -29,17 +27,20 @@ public class EventManager {
     private final Plugin plugin;
     private final Economy economy;
     private final BreathManager breathManager;
+    private final EventChestManager chestManager;
 
     public EventManager(
             @NotNull Plugin plugin,
             @NotNull Logger logger,
             @NotNull Economy economy,
-            @NotNull BreathManager breathManager
+            @NotNull BreathManager breathManager,
+            @NotNull EventChestManager chestManager
     ){
         this.logger = logger;
         this.plugin = plugin;
         this.economy = economy;
         this.breathManager = breathManager;
+        this.chestManager = chestManager;
     }
 
     public void start(){
@@ -47,6 +48,7 @@ public class EventManager {
         plugin.getServer().sendMessage(Messages.text("event.start"));
         players.clear();
         isEventActive = true;
+        chestManager.respawnAll();
 
         eventLoop = Bukkit.getScheduler().runTask(plugin, this::eventLoop);
     }

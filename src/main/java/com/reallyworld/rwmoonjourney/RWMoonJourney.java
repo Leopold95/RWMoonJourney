@@ -42,7 +42,7 @@ public final class RWMoonJourney extends JavaPlugin {
 
         eventChestManager = new EventChestManager();
         breathManager = new BreathManager();
-        eventManager = new EventManager(this, getLogger(), economy, breathManager);
+        eventManager = new EventManager(this, getLogger(), economy, breathManager, eventChestManager);
         eventTimer = new EventTimerService(eventManager, plugin, getLogger());
         eventTimer.startTimer();
 
@@ -56,7 +56,7 @@ public final class RWMoonJourney extends JavaPlugin {
     }
 
     private void registerCommands(){
-        getCommand(Commands.Base).setExecutor(new CommandBase(eventManager, eventChestManager));
+        getCommand(Commands.Base).setExecutor(new CommandBase(this, eventManager, eventChestManager));
         getCommand(Commands.Base).setTabCompleter(new CommandBaseCompleter());
     }
 

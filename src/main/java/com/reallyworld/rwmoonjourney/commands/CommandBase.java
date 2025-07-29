@@ -6,22 +6,27 @@ import com.reallyworld.rwmoonjourney.constants.Commands;
 import com.reallyworld.rwmoonjourney.constants.Permissions;
 import com.reallyworld.rwmoonjourney.core.EventChestManager;
 import com.reallyworld.rwmoonjourney.core.EventManager;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 public class CommandBase implements CommandExecutor {
     private final EventManager eventManager;
     private final EventChestManager eventChestManager;
+    private final Plugin plugin;
 
     public CommandBase(
+            @NotNull Plugin plugin,
             @NotNull EventManager eventManager,
             @NotNull EventChestManager eventChestManager
     ){
         this.eventManager = eventManager;
         this.eventChestManager = eventChestManager;
+        this.plugin = plugin;
     }
 
     @Override
@@ -129,7 +134,7 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                eventChestManager.spawn();
+                Bukkit.getScheduler().runTask(plugin, eventChestManager::respawnAll);
                 break;
             }
         }

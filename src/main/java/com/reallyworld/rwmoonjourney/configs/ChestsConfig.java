@@ -2,6 +2,8 @@ package com.reallyworld.rwmoonjourney.configs;
 
 import com.reallyworld.rwmoonjourney.api.config.BadConfigValueException;
 import com.reallyworld.rwmoonjourney.api.config.ConfigBase;
+import com.reallyworld.rwmoonjourney.models.ChestInfoModel;
+import lombok.var;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -41,10 +43,23 @@ public class ChestsConfig extends ConfigBase {
         locationData.put("yaw", location.getYaw());
         locationData.put("pitch", location.getPitch());
         locationData.put("rarity", rarity);
+        locationData.put("cost", rarityToCost(rarity));
+
 
         locationList.add(locationData);
         config.set(CHESTS_KEY, locationList);
         save();
+    }
+
+    public static List<ChestInfoModel> getAllChests(){
+        var models = new ArrayList<ChestInfoModel>();
+        var modelsList = config.getMapList(CHESTS_KEY);
+
+        for (var data : modelsList) {
+            var model = mapToChestIntoModel(data);
+            if (model != null) models.add(model);
+        }
+        return models;
     }
 
     public static List<Location> getAllLocations() {
@@ -107,6 +122,25 @@ public class ChestsConfig extends ConfigBase {
         return count;
     }
 
+    private static ChestInfoModel mapToChestIntoModel(Map<?, ?> data){
+        try {
+            String worldName = (String) data.get("world");
+            double x = ((Number) data.get("x")).doubleValue();
+            double y = ((Number) data.get("y")).doubleValue();
+            double z = ((Number) data.get("z")).doubleValue();
+            float yaw = ((Number) data.get("yaw")).floatValue();
+            float pitch = ((Number) data.get("pitch")).floatValue();
+            var location = new Location(Bukkit.getWorld(worldName), x, y, z, yaw, pitch);
+            String rarity = (String) data.get("rarity");
+            int cost = (Integer) data.get("cost");
+
+            return new ChestInfoModel(rarity, cost, location);
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed to parse location data: " + e.getMessage());
+            return null;
+        }
+    }
+
     private static Location mapToLocation(Map<?, ?> data) {
         try {
             String worldName = (String) data.get("world");
@@ -148,5 +182,28 @@ public class ChestsConfig extends ConfigBase {
         } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Возвращает цифровую редкость сундука по строковой. Данные берем из конфига.
+     * @param rarity строковая редкость
+     * @return цифровая редкость
+     */
+    private static int rarityToCost(String rarity){
+        var rarityCosts = Config.getStringList("chest-rarity-list");
+        for(var str: rarityCosts){
+            var splitted = str.split(":");
+
+            if(splitted.length < 2)
+                return 0;
+
+            try {
+                if(splitted[0].equals(rarity))
+                    return Integer.parseInt(splitted[1]);
+            }
+            catch (Exception ex){}
+        }
+
+        return 0;
     }
 }

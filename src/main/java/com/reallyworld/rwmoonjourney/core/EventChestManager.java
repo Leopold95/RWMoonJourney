@@ -1,24 +1,26 @@
 package com.reallyworld.rwmoonjourney.core;
 
 import com.reallyworld.rwmoonjourney.configs.ChestsConfig;
-import org.bukkit.Bukkit;
+import lombok.var;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.data.Directional;
-import org.bukkit.util.Vector;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class EventChestManager {
-    public void spawn() {
+    public void respawnAll() {
         removePrevious();
 
-        List<Location> chests = ChestsConfig.getAllLocations();
-        for (Location location : chests) {
-            Block block = location.getBlock();
+        var chests = ChestsConfig.getAllChests();
+        for (var chest: chests) {
+            var location = chest.getLocation();
+            var block = location.getBlock();
             block.setType(Material.CHEST);
 
             BlockFace direction = yawToCardinal(location.getYaw());
@@ -28,7 +30,21 @@ public class EventChestManager {
                 directional.setFacing(direction);
                 block.setBlockData(directional);
             }
+
+            var chestState = (Chest) block.getState();
+            var chestLoot = generateLoot(chest.getRarityCost()); //это надо заменить на кастомный генератор лута
+            chestState.getInventory().setContents(chestLoot.toArray(new ItemStack[0]));
         }
+    }
+
+    public Set<ItemStack> generateLoot(int rarityCost){
+        var items = new HashSet<ItemStack>();
+
+        items.add(new ItemStack(Material.DIAMOND, 2));
+        items.add(new ItemStack(Material.DIAMOND_SWORD, 4));
+        items.add(new ItemStack(Material.DIRT, 64));
+
+        return items;
     }
 
     private BlockFace yawToCardinal(float yaw) {
@@ -48,7 +64,12 @@ public class EventChestManager {
     public void removePrevious(){
         List<Location> chests = ChestsConfig.getAllLocations();
         for(Location location: chests){
-            location.getBlock().setType(Material.AIR);
+            if(location.getBlock().getType() == Material.CHEST){
+                var chest = (Chest) location.getBlock().getState();
+                chest.getInventory().setContents(new ItemStack[0]);
+
+                location.getBlock().setType(Material.AIR);
+            }
         }
     }
 }
