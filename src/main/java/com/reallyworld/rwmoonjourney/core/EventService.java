@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-public class EventManager {
+public class EventService {
     private final List<UUID> players = new ArrayList<>();
     private boolean isEventActive = false;
     private BukkitTask eventLoop;
@@ -26,21 +26,21 @@ public class EventManager {
     private final Logger logger;
     private final Plugin plugin;
     private final Economy economy;
-    private final BreathManager breathManager;
-    private final EventChestManager chestManager;
+    private final WaterBreathServiceImpl breathService;
+    private final ChestService chestService;
 
-    public EventManager(
+    public EventService(
             @NotNull Plugin plugin,
             @NotNull Logger logger,
             @NotNull Economy economy,
-            @NotNull BreathManager breathManager,
-            @NotNull EventChestManager chestManager
+            @NotNull WaterBreathServiceImpl breathService,
+            @NotNull ChestService chestService
     ){
         this.logger = logger;
         this.plugin = plugin;
         this.economy = economy;
-        this.breathManager = breathManager;
-        this.chestManager = chestManager;
+        this.breathService = breathService;
+        this.chestService = chestService;
     }
 
     public void start(){
@@ -48,7 +48,7 @@ public class EventManager {
         plugin.getServer().sendMessage(Messages.text("event.start"));
         players.clear();
         isEventActive = true;
-        chestManager.respawnAll();
+        chestService.respawnAll();
 
         eventLoop = Bukkit.getScheduler().runTask(plugin, this::eventLoop);
     }
@@ -81,7 +81,7 @@ public class EventManager {
 
     public void remove(@NotNull Player player){
         player.getPersistentDataContainer().remove(Keys.IS_ON_EVENT);
-        breathManager.removeBreath(player);
+        breathService.remove(player);
     }
 
     public boolean isPlayerWasOnCurrentEvent(UUID playerId){
@@ -101,7 +101,7 @@ public class EventManager {
     }
 
     public void buyBreath(@NotNull Player player){
-        if(breathManager.has(player)){
+        if(breathService.has(player)){
             player.sendMessage(Messages.text("event.breath.already-has"));
             return;
         }
@@ -113,7 +113,7 @@ public class EventManager {
             return;
         }
 
-        breathManager.addBreath(player);
+        breathService.add(player);
     }
 
     private void eventLoop(){
@@ -125,7 +125,7 @@ public class EventManager {
                 if(player == null || !player.isOnline())
                     continue;
 
-                breathManager.tryDamage(player);
+                breathService.tryDamage(player);
             }
         }
     }

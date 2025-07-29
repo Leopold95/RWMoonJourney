@@ -1,27 +1,27 @@
 package com.reallyworld.rwmoonjourney.listeners;
 
-import com.reallyworld.rwmoonjourney.core.BreathManager;
-import com.reallyworld.rwmoonjourney.core.EventManager;
+import com.reallyworld.rwmoonjourney.core.WaterBreathServiceImpl;
+import com.reallyworld.rwmoonjourney.core.EventService;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayerJoinListener implements Listener {
-    private final BreathManager breathManager;
-    private final EventManager eventManager;
+    private final WaterBreathServiceImpl breathService;
+    private final EventService eventService;
 
     public PlayerJoinListener(
-            @NotNull BreathManager breathManager,
-            @NotNull EventManager eventManager
+            @NotNull WaterBreathServiceImpl breathService,
+            @NotNull EventService eventService
             ) {
-        this.breathManager = breathManager;
-        this.eventManager = eventManager;
+        this.breathService = breathService;
+        this.eventService = eventService;
     }
 
     @EventHandler
     private void onJoin(PlayerJoinEvent event){
-        breathManager.removeBreath(event.getPlayer());
-        eventManager.remove(event.getPlayer());
+        breathService.remove(event.getPlayer());
+        eventService.remove(event.getPlayer());
     }
 }

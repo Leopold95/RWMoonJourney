@@ -12,12 +12,12 @@ import java.util.logging.Logger;
  * Service for delayed event stating
  */
 public class EventTimerService {
-    private final EventManager eventManager;
+    private final EventService eventService;
     private final Plugin plugin;
     private final Logger logger;
 
-    public EventTimerService(EventManager eventManager, Plugin plugin, Logger logger){
-        this.eventManager = eventManager;
+    public EventTimerService(EventService eventService, Plugin plugin, Logger logger){
+        this.eventService = eventService;
         this.logger = logger;
         this.plugin = plugin;
     }
@@ -40,7 +40,7 @@ public class EventTimerService {
         Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
             logger.info(Messages.message("logs.event.timer-start"));
             try {
-                eventManager.start();
+                eventService.start();
             }
             catch (Exception ignored){}
             startTimer();

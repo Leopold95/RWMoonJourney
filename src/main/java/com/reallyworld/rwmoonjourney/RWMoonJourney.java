@@ -6,9 +6,9 @@ import com.reallyworld.rwmoonjourney.configs.ChestsConfig;
 import com.reallyworld.rwmoonjourney.configs.Config;
 import com.reallyworld.rwmoonjourney.configs.Messages;
 import com.reallyworld.rwmoonjourney.constants.Commands;
-import com.reallyworld.rwmoonjourney.core.BreathManager;
-import com.reallyworld.rwmoonjourney.core.EventChestManager;
-import com.reallyworld.rwmoonjourney.core.EventManager;
+import com.reallyworld.rwmoonjourney.core.WaterBreathServiceImpl;
+import com.reallyworld.rwmoonjourney.core.ChestService;
+import com.reallyworld.rwmoonjourney.core.EventService;
 import com.reallyworld.rwmoonjourney.core.EventTimerService;
 import com.reallyworld.rwmoonjourney.listeners.PlayerJoinListener;
 import net.milkbowl.vault.economy.Economy;
@@ -18,9 +18,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class RWMoonJourney extends JavaPlugin {
     public static RWMoonJourney plugin; //used only for keys
 
-    public EventManager eventManager;
-    public BreathManager breathManager;
-    public EventChestManager eventChestManager;
+    public EventService eventService;
+    public WaterBreathServiceImpl breathService;
+    public ChestService eventChestService;
     private EventTimerService eventTimer;
 
     //di
@@ -40,10 +40,10 @@ public final class RWMoonJourney extends JavaPlugin {
             return;
         }
 
-        eventChestManager = new EventChestManager();
-        breathManager = new BreathManager();
-        eventManager = new EventManager(this, getLogger(), economy, breathManager, eventChestManager);
-        eventTimer = new EventTimerService(eventManager, plugin, getLogger());
+        eventChestService = new ChestService();
+        breathService = new WaterBreathServiceImpl();
+        eventService = new EventService(this, getLogger(), economy, breathService, eventChestService);
+        eventTimer = new EventTimerService(eventService, plugin, getLogger());
         eventTimer.startTimer();
 
         registerCommands();
@@ -56,13 +56,13 @@ public final class RWMoonJourney extends JavaPlugin {
     }
 
     private void registerCommands(){
-        getCommand(Commands.Base).setExecutor(new CommandBase(this, eventManager, eventChestManager));
+        getCommand(Commands.Base).setExecutor(new CommandBase(this, eventService, eventChestService));
         getCommand(Commands.Base).setTabCompleter(new CommandBaseCompleter());
     }
 
     private void registerListeners(){
         getServer().getPluginManager().registerEvents(
-                new PlayerJoinListener(breathManager, eventManager), this);
+                new PlayerJoinListener(breathService, eventService), this);
     }
 
     //of docks github code

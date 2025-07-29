@@ -4,8 +4,8 @@ import com.reallyworld.rwmoonjourney.configs.ChestsConfig;
 import com.reallyworld.rwmoonjourney.configs.Messages;
 import com.reallyworld.rwmoonjourney.constants.Commands;
 import com.reallyworld.rwmoonjourney.constants.Permissions;
-import com.reallyworld.rwmoonjourney.core.EventChestManager;
-import com.reallyworld.rwmoonjourney.core.EventManager;
+import com.reallyworld.rwmoonjourney.core.ChestService;
+import com.reallyworld.rwmoonjourney.core.EventService;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,17 +15,17 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 public class CommandBase implements CommandExecutor {
-    private final EventManager eventManager;
-    private final EventChestManager eventChestManager;
+    private final EventService eventService;
+    private final ChestService eventChestService;
     private final Plugin plugin;
 
     public CommandBase(
             @NotNull Plugin plugin,
-            @NotNull EventManager eventManager,
-            @NotNull EventChestManager eventChestManager
+            @NotNull EventService eventService,
+            @NotNull ChestService eventChestService
     ){
-        this.eventManager = eventManager;
-        this.eventChestManager = eventChestManager;
+        this.eventService = eventService;
+        this.eventChestService = eventChestService;
         this.plugin = plugin;
     }
 
@@ -43,7 +43,7 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                eventManager.start();
+                eventService.start();
                 break;
             }
 
@@ -53,7 +53,7 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                eventManager.stop();
+                eventService.stop();
                 break;
             }
 
@@ -68,7 +68,7 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                eventManager.join((Player) sender);
+                eventService.join((Player) sender);
                 break;
             }
 
@@ -83,7 +83,7 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                eventManager.time((Player) sender);
+                eventService.time((Player) sender);
                 break;
             }
 
@@ -98,7 +98,7 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                eventManager.buyBreath((Player) sender);
+                eventService.buyBreath((Player) sender);
                 break;
             }
 
@@ -134,7 +134,7 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                Bukkit.getScheduler().runTask(plugin, eventChestManager::respawnAll);
+                Bukkit.getScheduler().runTask(plugin, eventChestService::respawnAll);
                 break;
             }
         }
