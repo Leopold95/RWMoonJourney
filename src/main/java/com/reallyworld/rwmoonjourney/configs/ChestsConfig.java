@@ -28,10 +28,6 @@ public class ChestsConfig extends ConfigBase {
     protected static File configFile;
     protected static FileConfiguration config;
 
-    public static void addChest(String rarity, @NotNull Location location){
-        addLocation(location, rarity);
-    }
-
     public static void addLocation(Location location, String rarity) {
         List<Map<?, ?>> locationList = config.getMapList(CHESTS_KEY);
 
@@ -60,6 +56,10 @@ public class ChestsConfig extends ConfigBase {
             if (model != null) models.add(model);
         }
         return models;
+    }
+
+    public static int getCount(){
+        return config.getMapList(CHESTS_KEY).size();
     }
 
     public static List<Location> getAllLocations() {

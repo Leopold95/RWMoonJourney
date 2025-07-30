@@ -6,12 +6,10 @@ import com.reallyworld.rwmoonjourney.configs.ChestsConfig;
 import com.reallyworld.rwmoonjourney.configs.Config;
 import com.reallyworld.rwmoonjourney.configs.Messages;
 import com.reallyworld.rwmoonjourney.constants.Commands;
-import com.reallyworld.rwmoonjourney.core.WaterBreathServiceImpl;
-import com.reallyworld.rwmoonjourney.core.ChestService;
-import com.reallyworld.rwmoonjourney.core.EventService;
-import com.reallyworld.rwmoonjourney.core.EventTimerService;
+import com.reallyworld.rwmoonjourney.core.*;
 import com.reallyworld.rwmoonjourney.listeners.MobKillListener;
 import com.reallyworld.rwmoonjourney.listeners.PlayerJoinListener;
+import lombok.var;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,9 +17,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class RWMoonJourney extends JavaPlugin {
     public static RWMoonJourney plugin; //used only for keys
 
+    public MobService mobService;
     public EventService eventService;
     public WaterBreathServiceImpl breathService;
-    public ChestService eventChestService;
+    public ChestService chestService;
     private EventTimerService eventTimer;
 
     //di
@@ -41,11 +40,14 @@ public final class RWMoonJourney extends JavaPlugin {
             return;
         }
 
-        eventChestService = new ChestService();
+        mobService = new MobService();
+        chestService = new ChestService(getLogger());
         breathService = new WaterBreathServiceImpl();
-        eventService = new EventService(this, getLogger(), economy, breathService, eventChestService);
+        eventService = new EventService(this, getLogger(), economy, breathService, chestService, mobService);
         eventTimer = new EventTimerService(eventService, plugin, getLogger());
         eventTimer.startTimer();
+
+        printChestsCount();
 
         registerCommands();
         registerListeners();
@@ -56,15 +58,21 @@ public final class RWMoonJourney extends JavaPlugin {
         plugin = null;
     }
 
+    private void printChestsCount(){
+        var message = Messages.getString("logs.total-chests")
+                .replace("{count}", String.valueOf(ChestsConfig.getCount()));
+        getLogger().info(message);
+    }
+
     private void registerCommands(){
-        getCommand(Commands.Base).setExecutor(new CommandBase(this, eventService, eventChestService));
+        getCommand(Commands.Base).setExecutor(new CommandBase(this, eventService, chestService));
         getCommand(Commands.Base).setTabCompleter(new CommandBaseCompleter());
     }
 
     private void registerListeners(){
         getServer().getPluginManager().registerEvents(
                 new PlayerJoinListener(breathService, eventService), this);
-        getServer().getPluginManager().registerEvents(new MobKillListener(), this);
+        getServer().getPluginManager().registerEvents(new MobKillListener(economy), this);
     }
 
     //of docks github code

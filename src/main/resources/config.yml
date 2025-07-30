@@ -9,6 +9,7 @@ event-breath:
   time-mm: 10
 breath-damage: 1.5
 event-world: "world"
+chests-to-spawn: 99999 #сколько сундуков будет всего заспавнено на арене
 
 chest-rarity-list: #доступные редкости для сундуков, используется при генерации
   - rare:1000

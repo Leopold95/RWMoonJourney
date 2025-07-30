@@ -1,6 +1,5 @@
 package com.reallyworld.rwmoonjourney.commands;
 
-import com.reallyworld.rwmoonjourney.configs.ChestsConfig;
 import com.reallyworld.rwmoonjourney.configs.Messages;
 import com.reallyworld.rwmoonjourney.constants.Commands;
 import com.reallyworld.rwmoonjourney.constants.Permissions;
@@ -16,16 +15,16 @@ import org.jetbrains.annotations.NotNull;
 
 public class CommandBase implements CommandExecutor {
     private final EventService eventService;
-    private final ChestService eventChestService;
+    private final ChestService chestService;
     private final Plugin plugin;
 
     public CommandBase(
             @NotNull Plugin plugin,
             @NotNull EventService eventService,
-            @NotNull ChestService eventChestService
+            @NotNull ChestService chestService
     ){
         this.eventService = eventService;
-        this.eventChestService = eventChestService;
+        this.chestService = chestService;
         this.plugin = plugin;
     }
 
@@ -118,7 +117,7 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                ChestsConfig.addChest(args[1], ((Player) sender).getLocation());
+                chestService.addChest(args[1], ((Player) sender).getLocation());
                 sender.sendMessage(Messages.text("event.add-chest.done"));
                 break;
             }
@@ -134,7 +133,7 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                Bukkit.getScheduler().runTask(plugin, eventChestService::respawnAll);
+                Bukkit.getScheduler().runTask(plugin, chestService::respawnAll);
                 break;
             }
         }

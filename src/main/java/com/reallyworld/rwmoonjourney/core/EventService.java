@@ -8,6 +8,7 @@ import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
@@ -29,19 +30,22 @@ public class EventService {
     private final Economy economy;
     private final WaterBreathServiceImpl breathService;
     private final ChestService chestService;
+    private final MobService mobService;
 
     public EventService(
             @NotNull Plugin plugin,
             @NotNull Logger logger,
             @NotNull Economy economy,
             @NotNull WaterBreathServiceImpl breathService,
-            @NotNull ChestService chestService
+            @NotNull ChestService chestService,
+            @NotNull MobService mobService
     ){
         this.logger = logger;
         this.plugin = plugin;
         this.economy = economy;
         this.breathService = breathService;
         this.chestService = chestService;
+        this.mobService = mobService;
     }
 
     public void start(){

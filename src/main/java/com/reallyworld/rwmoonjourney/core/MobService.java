@@ -7,6 +7,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.persistence.PersistentDataType;
 
 public class MobService {
+    public void spawnCustomMobs(){
+
+    }
+
     public void removeCustomAllMobsFromEvent(){
         var worldStr = Config.getString("event-world");
         var world = Bukkit.getWorld(worldStr);

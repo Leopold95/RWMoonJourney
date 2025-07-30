@@ -9,11 +9,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 public class MobKillListener implements Listener {
     private final Economy economy;
 
-    public MobKillListener(Economy economy){
+    public MobKillListener(
+            @NotNull Economy economy
+    ){
         this.economy = economy;
     }
 
