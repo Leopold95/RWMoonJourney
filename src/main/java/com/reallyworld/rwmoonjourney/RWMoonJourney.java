@@ -7,10 +7,15 @@ import com.reallyworld.rwmoonjourney.configs.Config;
 import com.reallyworld.rwmoonjourney.configs.Messages;
 import com.reallyworld.rwmoonjourney.constants.Commands;
 import com.reallyworld.rwmoonjourney.core.*;
+import com.reallyworld.rwmoonjourney.core.event.ChestService;
+import com.reallyworld.rwmoonjourney.core.event.EventService;
+import com.reallyworld.rwmoonjourney.core.event.MobService;
+import com.reallyworld.rwmoonjourney.listeners.CommandListener;
 import com.reallyworld.rwmoonjourney.listeners.MobKillListener;
 import com.reallyworld.rwmoonjourney.listeners.PlayerJoinListener;
 import lombok.var;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -51,11 +56,25 @@ public final class RWMoonJourney extends JavaPlugin {
 
         registerCommands();
         registerListeners();
+
+        if(!checkBeforeStart()){
+            this.getServer().getPluginManager().disablePlugin(this);
+        }
     }
 
     @Override
     public void onDisable() {
         plugin = null;
+    }
+
+    private boolean checkBeforeStart(){
+        var world = Bukkit.getWorld("world.name");
+        if(world == null){
+            getLogger().info("event world is null");
+            return false;
+        }
+
+        return true;
     }
 
     private void printChestsCount(){
@@ -73,6 +92,7 @@ public final class RWMoonJourney extends JavaPlugin {
         getServer().getPluginManager().registerEvents(
                 new PlayerJoinListener(breathService, eventService), this);
         getServer().getPluginManager().registerEvents(new MobKillListener(economy), this);
+        getServer().getPluginManager().registerEvents(new CommandListener(), this);
     }
 
     //of docks github code

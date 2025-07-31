@@ -1,4 +1,4 @@
-package com.reallyworld.rwmoonjourney.core;
+package com.reallyworld.rwmoonjourney.core.event;
 
 import com.reallyworld.rwmoonjourney.configs.ChestsConfig;
 import com.reallyworld.rwmoonjourney.configs.Config;
@@ -11,10 +11,9 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.data.Directional;
-import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -68,10 +67,12 @@ public class ChestService {
     /**
      * Добавляет новый сундук который может быть заспавнен на арене.
      * @param rarity редкость сундука. Ограничего в конфиге
-     * @param location позиция. Куда смотрит камера - туда будет смотреть замок сундука.
+     * @param player позиция. Куда смотрит камера - туда будет смотреть замок сундука.
      */
-    public void addChest(@NotNull String rarity, @NotNull Location location){
-        ChestsConfig.addLocation(location, rarity);
+    public void addChest(@NotNull String rarity, @NotNull Player player){
+        ChestsConfig.addLocation(player.getLocation(), rarity);
+        player.sendMessage(Messages.text("event.add-chest.done"));
+
         var message = Messages.getString("logs.new-chest")
                 .replace("{count}", String.valueOf(ChestsConfig.getCount()));
         logger.info(message);

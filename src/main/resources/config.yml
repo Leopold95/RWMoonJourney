@@ -8,8 +8,21 @@ event-breath:
   cost: 1000
   time-mm: 10
 breath-damage: 1.5
-event-world: "world"
 chests-to-spawn: 99999 #сколько сундуков будет всего заспавнено на арене
+world:
+  name: "w"
+  lobby:
+    x: -103
+    y: 5
+    z: -55
+  spawn:
+    x: -127
+    y: 5
+    z: -80
+
+prevent-commands:
+  - 123
+  - 1324
 
 chest-rarity-list: #доступные редкости для сундуков, используется при генерации
   - rare:1000

@@ -3,8 +3,8 @@ package com.reallyworld.rwmoonjourney.commands;
 import com.reallyworld.rwmoonjourney.configs.Messages;
 import com.reallyworld.rwmoonjourney.constants.Commands;
 import com.reallyworld.rwmoonjourney.constants.Permissions;
-import com.reallyworld.rwmoonjourney.core.ChestService;
-import com.reallyworld.rwmoonjourney.core.EventService;
+import com.reallyworld.rwmoonjourney.core.event.ChestService;
+import com.reallyworld.rwmoonjourney.core.event.EventService;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -42,7 +42,7 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                eventService.start();
+                Bukkit.getScheduler().runTask(plugin, eventService::start);
                 break;
             }
 
@@ -52,7 +52,7 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                eventService.stop();
+                Bukkit.getScheduler().runTask(plugin, eventService::stop);
                 break;
             }
 
@@ -67,7 +67,22 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                eventService.join((Player) sender);
+                Bukkit.getScheduler().runTask(plugin, () -> eventService.join((Player) sender));
+                break;
+            }
+
+            case Commands.Leave:{
+                if(!(sender instanceof Player)){
+                    sender.sendMessage(Messages.playerOnly());
+                    return true;
+                }
+
+                if(!sender.hasPermission(Permissions.CommandMJLeave)){
+                    sender.sendMessage(Messages.noPerm());
+                    return true;
+                }
+
+                Bukkit.getScheduler().runTask(plugin, () -> eventService.leave((Player) sender));
                 break;
             }
 
@@ -82,7 +97,7 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                eventService.time((Player) sender);
+                Bukkit.getScheduler().runTask(plugin, () -> eventService.time((Player) sender));
                 break;
             }
 
@@ -97,7 +112,7 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                eventService.buyBreath((Player) sender);
+                Bukkit.getScheduler().runTask(plugin, () -> eventService.buyBreath((Player) sender));
                 break;
             }
 
@@ -117,8 +132,7 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                chestService.addChest(args[1], ((Player) sender).getLocation());
-                sender.sendMessage(Messages.text("event.add-chest.done"));
+                Bukkit.getScheduler().runTask(plugin, () -> chestService.addChest(args[1], ((Player) sender)));
                 break;
             }
 

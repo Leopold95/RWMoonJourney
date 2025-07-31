@@ -24,6 +24,7 @@ public class CommandBaseCompleter implements TabCompleter {
             list.add(Commands.StartEvent);
             list.add(Commands.StopEvent);
             list.add(Commands.Join);
+            list.add(Commands.Leave);
             list.add(Commands.Time);
             list.add(Commands.BuyBreath);
             if(sender.hasPermission(Permissions.CommandMJAddChest))

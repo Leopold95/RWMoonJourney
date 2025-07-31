@@ -1,7 +1,7 @@
 package com.reallyworld.rwmoonjourney.listeners;
 
 import com.reallyworld.rwmoonjourney.core.WaterBreathServiceImpl;
-import com.reallyworld.rwmoonjourney.core.EventService;
+import com.reallyworld.rwmoonjourney.core.event.EventService;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
