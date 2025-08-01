@@ -1,14 +1,13 @@
 package com.reallyworld.rwmoonjourney.core.event;
 
+import com.reallyworld.rwmoonjourney.abstraction.IBreathService;
 import com.reallyworld.rwmoonjourney.configs.Config;
 import com.reallyworld.rwmoonjourney.configs.Messages;
 import com.reallyworld.rwmoonjourney.core.Keys;
-import com.reallyworld.rwmoonjourney.core.WaterBreathServiceImpl;
 import com.reallyworld.rwmoonjourney.utils.TimeUtils;
 import lombok.var;
 import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -16,34 +15,40 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Logger;
 
 /**
  * Основной сервис контроля событием
  */
 public class EventService {
-    private final List<UUID> players = new ArrayList<>();
+    private final Set<UUID> players = new ConcurrentSkipListSet<>();
     private boolean isEventActive = false;
+
+    private long maxEventDuration = Config.getLong("event-duration-seconds");
+    private long eventTimer = 0;
+
+    @Nullable
     private BukkitTask eventLoop;
 
     private final Logger logger;
     private final Plugin plugin;
     private final Economy economy;
-    private final WaterBreathServiceImpl breathService;
+    private final IBreathService breathService;
     private final ChestService chestService;
     private final MobService mobService;
 
-    private EventState eventState = EventState.Waiting;
+    private EventState eventState = EventState.Stopped;
 
     public EventService(
             @NotNull Plugin plugin,
             @NotNull Logger logger,
             @NotNull Economy economy,
-            @NotNull WaterBreathServiceImpl breathService,
+            @NotNull IBreathService breathService,
             @NotNull ChestService chestService,
             @NotNull MobService mobService
     ){
@@ -56,7 +61,14 @@ public class EventService {
     }
 
     public void startJoining(){
+        logger.info(Messages.message("logs.event.joining"));
+        plugin.getServer().sendMessage(Messages.text("event.joining"));
 
+        eventState = EventState.Joining;
+        players.clear();
+
+        var lobbyTime = Config.getInt("lobby-time-seconds");
+        Bukkit.getScheduler().runTaskLater(plugin, this::start, lobbyTime * 20L);
     }
 
     /**
@@ -65,11 +77,24 @@ public class EventService {
     public void start(){
         logger.info(Messages.message("logs.event.start"));
         plugin.getServer().sendMessage(Messages.text("event.start"));
-        players.clear();
+
+        eventState = EventState.Running;
         isEventActive = true;
         chestService.respawnAll();
+        eventTimer = 0;
 
-        eventLoop = Bukkit.getScheduler().runTask(plugin, this::eventLoop);
+        eventLoop = Bukkit.getScheduler().runTaskTimer(plugin, this::eventLoop, 0, 20L);
+
+        for (var playerUuid: players){
+            var player = Bukkit.getPlayer(playerUuid);
+            if(player == null)
+                return;
+
+            if(!player.isOnline())
+                return;
+
+            teleportToEvent(player);
+        }
     }
 
     /**
@@ -78,10 +103,30 @@ public class EventService {
     public void stop(){
         logger.info(Messages.message("logs.event.stop"));
         plugin.getServer().sendMessage(Messages.text("event.stop"));
-        players.clear();
+
+        eventState = EventState.Stopped;
         isEventActive = false;
-        eventLoop.cancel();
-        eventLoop = null;
+        eventTimer = 0;
+
+        for(var playerUuid: players){
+            var player = Bukkit.getPlayer(playerUuid);
+            if(player == null)
+                return;
+
+            if(!player.isOnline())
+                return;
+
+            remove(player);
+        }
+
+        if(eventLoop != null){
+            eventLoop.cancel();
+            eventLoop = null;
+        }
+
+        players.clear();
+
+        //TODO что делать с игроками, которые были на ивенте в момент его завершения
     }
 
     /**
@@ -89,7 +134,7 @@ public class EventService {
      * @param player игрок
      */
     public void join(@NotNull Player player){
-        if(eventState == EventState.Waiting){
+        if(eventState == EventState.Stopped){
             player.sendMessage(Messages.text("event.now-waiting"));
             return;
         }
@@ -99,9 +144,14 @@ public class EventService {
             return;
         }
 
-        int eventCost = Config.getInt("event-join-cost");
+        if(players.contains(player.getUniqueId())){
+            player.sendMessage(Messages.text("event.already-member"));
+            return;
+        }
 
-        EconomyResponse resp = economy.withdrawPlayer(player, eventCost);
+        var eventCost = Config.getInt("event-join-cost");
+
+        var resp = economy.withdrawPlayer(player, eventCost);
         if(!resp.transactionSuccess()){
             player.sendMessage(Messages.text("event.no-money-join"));
             return;
@@ -111,6 +161,8 @@ public class EventService {
         players.add(player.getUniqueId());
 
         teleportToLobby(player);
+
+        player.sendMessage(Messages.text("event.joined"));
     }
 
     /**
@@ -138,10 +190,11 @@ public class EventService {
      */
     public void remove(@NotNull Player player){
         player.getPersistentDataContainer().remove(Keys.IS_ON_EVENT);
+        players.remove(player.getUniqueId());
         breathService.remove(player);
     }
 
-    public boolean isPlayerWasOnCurrentEvent(UUID playerId){
+    public boolean isPlayerOnEvent(UUID playerId){
         return players.contains(playerId);
     }
 
@@ -173,7 +226,7 @@ public class EventService {
 
         var breathCost = Config.getInt("event-breath.cost");
         var resp = economy.withdrawPlayer(player, breathCost);
-        if(resp.transactionSuccess()){
+        if(!resp.transactionSuccess()){
             player.sendMessage(Messages.text("event.breath.no-money"));
             return;
         }
@@ -186,7 +239,7 @@ public class EventService {
      * @param player игрок
      */
     private void teleportToLobby(@NotNull Player player){
-        var world = Bukkit.getWorld("world.name");
+        var world = Bukkit.getWorld(Config.getString("world.name"));
         if(world == null)
             return;
 
@@ -195,20 +248,42 @@ public class EventService {
         var z = Config.getInt("world.lobby.z");
 
         var location = new Location(world, x, y, z);
+
+        player.teleportAsync(location);
+    }
+
+    /**
+     * Телепортирует всех игроков на точку ивента
+     * @param player игрок
+     */
+    private void teleportToEvent(@NotNull Player player){
+        var world = Bukkit.getWorld(Config.getString("world.name"));
+        if(world == null)
+            return;
+
+        var x = Config.getInt("world.spawn.x");
+        var y = Config.getInt("world.spawn.y");
+        var z = Config.getInt("world.spawn.z");
+
+        var location = new Location(world, x, y, z);
         player.teleportAsync(location);
     }
 
     private void eventLoop(){
-        while (isEventActive){
-            logger.info("updatings");
+        logger.info("updatings");
 
-            for(UUID pUuid: players){
-                Player player = Bukkit.getPlayer(pUuid);
-                if(player == null || !player.isOnline())
-                    continue;
+        eventTimer += 1;
 
-                breathService.tryDamage(player);
-            }
+        for(UUID pUuid: players){
+            Player player = Bukkit.getPlayer(pUuid);
+            if(player == null || !player.isOnline())
+                continue;
+
+            breathService.tryDamage(player);
+        }
+
+        if(eventTimer >= maxEventDuration){
+            stop();
         }
     }
 }

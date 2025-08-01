@@ -2,15 +2,16 @@ startup-time:
   week-day: 7
   time: "19:30" #format is H:mm
   time-zone: "" # can be null
-
-event-join-cost: 20000
+event-join-cost: 1000
 event-breath:
   cost: 1000
   time-mm: 10
 breath-damage: 1.5
-chests-to-spawn: 99999 #сколько сундуков будет всего заспавнено на арене
+chests-to-spawn: 3 #сколько сундуков будет всего заспавнено на арене
+lobby-time-seconds: 10 #сколько времени будет длится подготовка ивента в секундах
+event-duration-seconds: 30 #сколько ивент будет длиться в секундах
 world:
-  name: "w"
+  name: "event_world"
   lobby:
     x: -103
     y: 5
@@ -20,9 +21,12 @@ world:
     y: 5
     z: -80
 
-prevent-commands:
-  - 123
-  - 1324
+prevent-commands: #команды которые надо заблокировать. Алиасы можно не учитывать
+  - "123"
+  - "1324"
+  - heal
+  - kill
+  - back
 
 chest-rarity-list: #доступные редкости для сундуков, используется при генерации
   - rare:1000

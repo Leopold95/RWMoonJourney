@@ -1,4 +1,5 @@
 name: RWMoonJourney
+authors: ["Leopold95"]
 version: '${version}'
 main: com.reallyworld.rwmoonjourney.RWMoonJourney
 api-version: '1.16'

@@ -1,12 +1,14 @@
 package com.reallyworld.rwmoonjourney;
 
+import com.reallyworld.rwmoonjourney.abstraction.IBreathService;
 import com.reallyworld.rwmoonjourney.commands.CommandBase;
 import com.reallyworld.rwmoonjourney.commands.CommandBaseCompleter;
 import com.reallyworld.rwmoonjourney.configs.ChestsConfig;
 import com.reallyworld.rwmoonjourney.configs.Config;
 import com.reallyworld.rwmoonjourney.configs.Messages;
 import com.reallyworld.rwmoonjourney.constants.Commands;
-import com.reallyworld.rwmoonjourney.core.*;
+import com.reallyworld.rwmoonjourney.core.EventTimerService;
+import com.reallyworld.rwmoonjourney.core.WaterBreathServiceImpl;
 import com.reallyworld.rwmoonjourney.core.event.ChestService;
 import com.reallyworld.rwmoonjourney.core.event.EventService;
 import com.reallyworld.rwmoonjourney.core.event.MobService;
@@ -24,7 +26,7 @@ public final class RWMoonJourney extends JavaPlugin {
 
     public MobService mobService;
     public EventService eventService;
-    public WaterBreathServiceImpl breathService;
+    public IBreathService breathService;
     public ChestService chestService;
     private EventTimerService eventTimer;
 
@@ -68,9 +70,9 @@ public final class RWMoonJourney extends JavaPlugin {
     }
 
     private boolean checkBeforeStart(){
-        var world = Bukkit.getWorld("world.name");
+        var world = Bukkit.getWorld(Config.getString("world.name"));
         if(world == null){
-            getLogger().info("event world is null");
+            getLogger().info("event world is null: ");
             return false;
         }
 
@@ -90,9 +92,9 @@ public final class RWMoonJourney extends JavaPlugin {
 
     private void registerListeners(){
         getServer().getPluginManager().registerEvents(
-                new PlayerJoinListener(breathService, eventService), this);
+                new PlayerJoinListener(eventService), this);
         getServer().getPluginManager().registerEvents(new MobKillListener(economy), this);
-        getServer().getPluginManager().registerEvents(new CommandListener(), this);
+        getServer().getPluginManager().registerEvents(new CommandListener(eventService), this);
     }
 
     //of docks github code

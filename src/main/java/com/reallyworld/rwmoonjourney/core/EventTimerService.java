@@ -41,7 +41,7 @@ public class EventTimerService {
         Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
             logger.info(Messages.message("logs.event.timer-start"));
             try {
-                eventService.start();
+                eventService.startJoining();
             }
             catch (Exception ignored){}
             startTimer();

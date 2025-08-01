@@ -102,10 +102,7 @@ public class Config extends ConfigBase {
         return config.getBoolean(path, defaultValue);
     }
 
-    public static long getLong(String path) throws BadConfigValueException {
-        if (!config.isSet(path)) {
-            throw new BadConfigValueException(path);
-        }
+    public static long getLong(String path) {
         return config.getLong(path);
     }
 

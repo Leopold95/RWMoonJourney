@@ -29,6 +29,9 @@ public class ChestService {
 
     private final int MAX_SLOT_INDEX = 27;
 
+    /**
+     * Спавнит сундуки на карте и заполняет их лутом.
+     */
     public void respawnAll() {
         removePrevious();
 
@@ -177,6 +180,11 @@ public class ChestService {
         return result;
     }
 
+    /**
+     * Просчитывает куда будет смотреть сундук
+     * @param yaw градусы
+     * @return направление блока
+     */
     private BlockFace yawToCardinal(float yaw) {
         yaw = (yaw % 360 + 360) % 360;
 

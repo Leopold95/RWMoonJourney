@@ -10,7 +10,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
 public class WaterBreathServiceImpl implements IBreathService {
-    private PotionEffect waterBreating = new PotionEffect(PotionEffectType.WATER_BREATHING, 9999999, 1);
+    private PotionEffect waterBreating = new PotionEffect(PotionEffectType.WATER_BREATHING, 99999, 1);
 
     public void add(@NotNull Player player){
         player.getPersistentDataContainer().set(Keys.HAS_BREATH, PersistentDataType.INTEGER, 1);
@@ -28,10 +28,10 @@ public class WaterBreathServiceImpl implements IBreathService {
     }
 
     public void tryDamage(@NotNull Player player){
-        if(!player.getPersistentDataContainer().has(Keys.HAS_BREATH, PersistentDataType.INTEGER))
+        if(!player.getPersistentDataContainer().has(Keys.IS_ON_EVENT, PersistentDataType.INTEGER))
             return;
 
-        if(!player.getPersistentDataContainer().has(Keys.IS_ON_EVENT, PersistentDataType.INTEGER))
+        if(player.getPersistentDataContainer().has(Keys.HAS_BREATH, PersistentDataType.INTEGER))
             return;
 
         player.damage(Config.getDouble("breath-damage"));

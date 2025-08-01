@@ -1,7 +1,7 @@
 package com.reallyworld.rwmoonjourney.core.event;
 
 public enum EventState {
-    Waiting,
+    Stopped,
     Running,
     Joining
 }

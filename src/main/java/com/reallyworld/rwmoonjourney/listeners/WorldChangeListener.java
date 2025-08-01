@@ -1,0 +1,28 @@
+package com.reallyworld.rwmoonjourney.listeners;
+
+import com.reallyworld.rwmoonjourney.configs.Config;
+import com.reallyworld.rwmoonjourney.core.event.EventService;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
+
+public class WorldChangeListener implements Listener {
+    private final EventService eventService;
+
+    public WorldChangeListener(EventService eventService){
+        this.eventService = eventService;
+    }
+
+    /**
+     * Когда игрок меняет мир с ивентового на обычный, значит он презашел или тепнулся - его статус как игрока ивнета
+     * должен быть убран
+     * @param event ивент захода на сервер
+     */
+    @EventHandler
+    private void onChangeWorld(PlayerChangedWorldEvent event){
+        if(!event.getFrom().getName().equals(Config.getString("world.name")))
+            return;
+
+        eventService.remove(event.getPlayer());
+    }
+}

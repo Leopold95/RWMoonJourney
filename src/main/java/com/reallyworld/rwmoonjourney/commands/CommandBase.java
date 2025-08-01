@@ -42,7 +42,7 @@ public class CommandBase implements CommandExecutor {
                     return true;
                 }
 
-                Bukkit.getScheduler().runTask(plugin, eventService::start);
+                Bukkit.getScheduler().runTask(plugin, eventService::startJoining);
                 break;
             }
 
