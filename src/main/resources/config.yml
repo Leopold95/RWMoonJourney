@@ -1,15 +1,18 @@
 startup-time:
   week-day: 7
   time: "19:30" #format is H:mm
-  time-zone: "" # can be null
+  time-zone: "" #can be null
+
 event-join-cost: 1000
 event-breath:
   cost: 1000
   time-mm: 10
-breath-damage: 1.5
-chests-to-spawn: 3 #сколько сундуков будет всего заспавнено на арене
-lobby-time-seconds: 10 #сколько времени будет длится подготовка ивента в секундах
+
+breath-damage: 1.5 #урон от дыхания
+chests-to-spawn: 3 #сколько сундуков будет всего заспавнено на арене при начале ивента
+lobby-time-seconds: 10 #сколько времени будет длиться подготовка ивента в секундах
 event-duration-seconds: 30 #сколько ивент будет длиться в секундах
+
 world:
   name: "event_world"
   lobby:
@@ -21,7 +24,13 @@ world:
     y: 5
     z: -80
 
-prevent-commands: #команды которые надо заблокировать. Алиасы можно не учитывать
+spawn: #точка спавна игрока в обычном игровом мире
+  world: "world"
+  x: 0
+  y: 5
+  z: 0
+
+prevent-commands: #команды которые надо заблокировать в мире ивента. Алиасы можно не учитывать
   - "123"
   - "1324"
   - heal

@@ -235,6 +235,14 @@ public class EventService {
     }
 
     /**
+     * Телепортировать игрока на спавн
+     * @param player игрок
+     */
+    public void teleportToSpawn(@NotNull Player player){
+
+    }
+
+    /**
      * Телепортировать игрока в лобби
      * @param player игрок
      */

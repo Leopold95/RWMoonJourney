@@ -15,43 +15,50 @@ import com.reallyworld.rwmoonjourney.core.event.MobService;
 import com.reallyworld.rwmoonjourney.listeners.CommandListener;
 import com.reallyworld.rwmoonjourney.listeners.MobKillListener;
 import com.reallyworld.rwmoonjourney.listeners.PlayerJoinListener;
+import lombok.extern.slf4j.Slf4j;
 import lombok.var;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.logging.Logger;
+
+@Slf4j
 public final class RWMoonJourney extends JavaPlugin {
     public static RWMoonJourney plugin; //used only for keys
 
-    public MobService mobService;
-    public EventService eventService;
-    public IBreathService breathService;
-    public ChestService chestService;
+    private Logger logger;
+
+    private MobService mobService;
+    private EventService eventService;
+    private IBreathService breathService;
+    private ChestService chestService;
     private EventTimerService eventTimer;
 
     //di
-    public Economy economy;
+    private Economy economy;
 
     @Override
     public void onEnable() {
         plugin = this;
+        logger = getLogger();
 
         Config.init(this, "config.yml");
         Messages.init(this, "messages.yml");
         ChestsConfig.init(this, "chests.yml");
 
         if (!setupEconomy() ) {
-            getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+            logger.severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
         mobService = new MobService();
-        chestService = new ChestService(getLogger());
+        chestService = new ChestService(logger);
         breathService = new WaterBreathServiceImpl();
-        eventService = new EventService(this, getLogger(), economy, breathService, chestService, mobService);
-        eventTimer = new EventTimerService(eventService, plugin, getLogger());
+        eventService = new EventService(this, logger, economy, breathService, chestService, mobService);
+        eventTimer = new EventTimerService(eventService, plugin, logger);
         eventTimer.startTimer();
 
         printChestsCount();
@@ -59,8 +66,8 @@ public final class RWMoonJourney extends JavaPlugin {
         registerCommands();
         registerListeners();
 
-        if(!checkBeforeStart()){
-            this.getServer().getPluginManager().disablePlugin(this);
+        if(!checkBeforeEnable()){
+            getServer().getPluginManager().disablePlugin(this);
         }
     }
 
@@ -69,20 +76,33 @@ public final class RWMoonJourney extends JavaPlugin {
         plugin = null;
     }
 
-    private boolean checkBeforeStart(){
-        var world = Bukkit.getWorld(Config.getString("world.name"));
-        if(world == null){
-            getLogger().info("event world is null: ");
+    /**
+     * Проверяет некоторіе вещи перед запуском плагина.
+     * @return да - можно запустить, нет - плагин будет выключен
+     */
+    private boolean checkBeforeEnable(){
+        var eventworld = Bukkit.getWorld(Config.getString("world.name"));
+        if(eventworld == null){
+            logger.warning(Messages.getString("logs.no-event-world"));
+            return false;
+        }
+
+        var spawnWorld = Bukkit.getWorld(Config.getString("spawn.world"));
+        if(spawnWorld == null){
+            logger.warning(Messages.getString("logs.no-spawn-world"));
             return false;
         }
 
         return true;
     }
 
+    /**
+     * Вывод количество созданных сундуков.
+     */
     private void printChestsCount(){
         var message = Messages.getString("logs.total-chests")
                 .replace("{count}", String.valueOf(ChestsConfig.getCount()));
-        getLogger().info(message);
+        logger.info(message);
     }
 
     private void registerCommands(){
@@ -91,8 +111,7 @@ public final class RWMoonJourney extends JavaPlugin {
     }
 
     private void registerListeners(){
-        getServer().getPluginManager().registerEvents(
-                new PlayerJoinListener(eventService), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(eventService), this);
         getServer().getPluginManager().registerEvents(new MobKillListener(economy), this);
         getServer().getPluginManager().registerEvents(new CommandListener(eventService), this);
     }
