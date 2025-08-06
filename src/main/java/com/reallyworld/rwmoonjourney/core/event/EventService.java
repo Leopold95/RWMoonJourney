@@ -117,6 +117,7 @@ public class EventService {
                 return;
 
             remove(player);
+            teleportToSpawn(player);
         }
 
         if(eventLoop != null){
@@ -234,12 +235,23 @@ public class EventService {
         breathService.add(player);
     }
 
+
     /**
      * Телепортировать игрока на спавн
      * @param player игрок
      */
     public void teleportToSpawn(@NotNull Player player){
+        var world = Bukkit.getWorld(Config.getString("spawn.world"));
+        if(world == null)
+            return;
 
+        var x = Config.getInt("spawn.world.x");
+        var y = Config.getInt("spawn.world.y");
+        var z = Config.getInt("spawn.world.z");
+
+        var location = new Location(world, x, y, z);
+
+        player.teleportAsync(location);
     }
 
     /**
@@ -269,6 +281,7 @@ public class EventService {
         if(world == null)
             return;
 
+
         var x = Config.getInt("world.spawn.x");
         var y = Config.getInt("world.spawn.y");
         var z = Config.getInt("world.spawn.z");
@@ -278,8 +291,6 @@ public class EventService {
     }
 
     private void eventLoop(){
-        logger.info("updatings");
-
         eventTimer += 1;
 
         for(UUID pUuid: players){

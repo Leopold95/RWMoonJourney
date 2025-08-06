@@ -14,6 +14,7 @@ import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -30,30 +31,17 @@ public class ChestService {
     private final int MAX_SLOT_INDEX = 27;
 
     /**
-     * Спавнит сундуки на карте и заполняет их лутом.
+     * Спавнит сундуки на карте и заполняет их лутом. Количество ограничено конфигом
+     * и количеством созданных сундуков.
      */
     public void respawnAll() {
         removePrevious();
 
-        var chests = chestsToSpawn();
-        for (var chest: chests) {
-            var location = chest.getLocation();
-            var block = location.getBlock();
-            block.setType(Material.CHEST);
+        for (var chest: chestsToSpawn()) {
+            spawnChest(chest);
 
-            BlockFace direction = yawToCardinal(location.getYaw());
-
-            if (block.getBlockData() instanceof Directional) {
-                Directional directional = (Directional) block.getBlockData();
-                directional.setFacing(direction);
-                block.setBlockData(directional);
-            }
-
-
-            //TODO вынести в метод
-            var chestState = (Chest) block.getState();
             var chestLoot = generateLoot(chest.getRarityCost()); //это надо заменить на кастомный генератор лута
-            fillChestRandom(chestState, chestLoot);
+            fillChest(getChestFromLocation(chest.getLocation()), chestLoot);
         }
     }
 
@@ -79,6 +67,33 @@ public class ChestService {
         var message = Messages.getString("logs.new-chest")
                 .replace("{count}", String.valueOf(ChestsConfig.getCount()));
         logger.info(message);
+    }
+
+    @Nullable
+    private Chest getChestFromLocation(Location location){
+        if(location.getBlock().getType() != Material.CHEST)
+            return null;
+
+        var block = location.getBlock();
+        return (Chest) block.getState();
+    }
+
+    /**
+     * Спавнит сундук на точке и поворачивает в нужную сторону
+     * @param chest модель сундука
+     */
+    private void spawnChest(ChestInfoModel chest){
+        var location = chest.getLocation();
+        var block = location.getBlock();
+        block.setType(Material.CHEST);
+
+        BlockFace direction = yawToCardinal(location.getYaw());
+
+        if (block.getBlockData() instanceof Directional) {
+            Directional directional = (Directional) block.getBlockData();
+            directional.setFacing(direction);
+            block.setBlockData(directional);
+        }
     }
 
     /**
@@ -119,7 +134,8 @@ public class ChestService {
      * @param chest сундук
      * @param items предметы для заполнения
      */
-    private void fillChestRandom(Chest chest, Set<ItemStack> items){
+    private void fillChest(@Nullable Chest chest, Set<ItemStack> items){
+        if(chest == null) return;
         if(items.isEmpty()) return;
 
         // Если предметов больше или равно количеству слотов - заполняем все слоты
