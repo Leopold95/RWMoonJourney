@@ -12,6 +12,7 @@ import com.reallyworld.rwmoonjourney.core.WaterBreathServiceImpl;
 import com.reallyworld.rwmoonjourney.core.event.ChestService;
 import com.reallyworld.rwmoonjourney.core.event.EventService;
 import com.reallyworld.rwmoonjourney.core.event.MobService;
+import com.reallyworld.rwmoonjourney.core.event.PlayerService;
 import com.reallyworld.rwmoonjourney.listeners.CommandListener;
 import com.reallyworld.rwmoonjourney.listeners.MobKillListener;
 import com.reallyworld.rwmoonjourney.listeners.PlayerJoinListener;
@@ -30,6 +31,7 @@ public final class RWMoonJourney extends JavaPlugin {
 
     private Logger logger;
 
+    private PlayerService playerService;
     private MobService mobService;
     private EventService eventService;
     private IBreathService breathService;
@@ -54,10 +56,11 @@ public final class RWMoonJourney extends JavaPlugin {
             return;
         }
 
+        playerService = new PlayerService();
         mobService = new MobService();
         chestService = new ChestService(logger);
         breathService = new WaterBreathServiceImpl();
-        eventService = new EventService(this, logger, economy, breathService, chestService, mobService);
+        eventService = new EventService(this, logger, economy, breathService, chestService, mobService, playerService);
         eventTimer = new EventTimerService(eventService, plugin, logger);
         eventTimer.startTimer();
 

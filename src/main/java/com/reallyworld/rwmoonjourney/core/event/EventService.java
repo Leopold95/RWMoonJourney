@@ -41,6 +41,7 @@ public class EventService {
     private final IBreathService breathService;
     private final ChestService chestService;
     private final MobService mobService;
+    private final PlayerService playerService;
 
     private EventState eventState = EventState.Stopped;
 
@@ -50,7 +51,8 @@ public class EventService {
             @NotNull Economy economy,
             @NotNull IBreathService breathService,
             @NotNull ChestService chestService,
-            @NotNull MobService mobService
+            @NotNull MobService mobService,
+            @NotNull PlayerService playerService
     ){
         this.logger = logger;
         this.plugin = plugin;
@@ -58,6 +60,7 @@ public class EventService {
         this.breathService = breathService;
         this.chestService = chestService;
         this.mobService = mobService;
+        this.playerService = playerService;
     }
 
     public void startJoining(){
@@ -93,7 +96,7 @@ public class EventService {
             if(!player.isOnline())
                 return;
 
-            teleportToEvent(player);
+            playerService.teleportToEvent(player);
         }
     }
 
@@ -117,7 +120,7 @@ public class EventService {
                 return;
 
             remove(player);
-            teleportToSpawn(player);
+            playerService.teleportToSpawn(player);
         }
 
         if(eventLoop != null){
@@ -161,7 +164,7 @@ public class EventService {
         player.getPersistentDataContainer().set(Keys.IS_ON_EVENT, PersistentDataType.INTEGER, 1);
         players.add(player.getUniqueId());
 
-        teleportToLobby(player);
+        playerService.teleportToLobby(player);
 
         player.sendMessage(Messages.text("event.joined"));
     }
@@ -233,61 +236,6 @@ public class EventService {
         }
 
         breathService.add(player);
-    }
-
-
-    /**
-     * Телепортировать игрока на спавн
-     * @param player игрок
-     */
-    public void teleportToSpawn(@NotNull Player player){
-        var world = Bukkit.getWorld(Config.getString("spawn.world"));
-        if(world == null)
-            return;
-
-        var x = Config.getInt("spawn.world.x");
-        var y = Config.getInt("spawn.world.y");
-        var z = Config.getInt("spawn.world.z");
-
-        var location = new Location(world, x, y, z);
-
-        player.teleportAsync(location);
-    }
-
-    /**
-     * Телепортировать игрока в лобби
-     * @param player игрок
-     */
-    private void teleportToLobby(@NotNull Player player){
-        var world = Bukkit.getWorld(Config.getString("world.name"));
-        if(world == null)
-            return;
-
-        var x = Config.getInt("world.lobby.x");
-        var y = Config.getInt("world.lobby.y");
-        var z = Config.getInt("world.lobby.z");
-
-        var location = new Location(world, x, y, z);
-
-        player.teleportAsync(location);
-    }
-
-    /**
-     * Телепортирует всех игроков на точку ивента
-     * @param player игрок
-     */
-    private void teleportToEvent(@NotNull Player player){
-        var world = Bukkit.getWorld(Config.getString("world.name"));
-        if(world == null)
-            return;
-
-
-        var x = Config.getInt("world.spawn.x");
-        var y = Config.getInt("world.spawn.y");
-        var z = Config.getInt("world.spawn.z");
-
-        var location = new Location(world, x, y, z);
-        player.teleportAsync(location);
     }
 
     private void eventLoop(){
