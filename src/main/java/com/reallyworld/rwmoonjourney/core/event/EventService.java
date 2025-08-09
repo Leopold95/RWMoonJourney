@@ -66,7 +66,7 @@ public class EventService {
         logger.info(Messages.message("logs.event.joining"));
         plugin.getServer().broadcast(Messages.text("event.joining"));
 
-        eventState = EventState.Joining;
+        eventState = EventState.Lobby;
         players.clear();
 
         var lobbyTime = Config.getInt("lobby-time-seconds");
@@ -223,6 +223,11 @@ public class EventService {
      * @param player покупатель
      */
     public void buyBreath(@NotNull Player player){
+        if(eventState != EventState.Lobby){
+            player.sendMessage(Messages.getText("event.breath.bad-state"));
+            return;
+        }
+
         if(breathService.has(player)){
             player.sendMessage(Messages.text("event.breath.already-has"));
             return;
