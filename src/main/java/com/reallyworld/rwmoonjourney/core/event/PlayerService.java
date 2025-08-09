@@ -68,6 +68,9 @@ public class PlayerService {
      */
     public void dropLoot(@NotNull Player player){ //TODO возможно сделать прсто убийством ?
         for (var item: player.getInventory()){
+            if(item == null)
+                continue;
+
             player.getWorld().dropItemNaturally(player.getLocation(), item);
         }
 

@@ -13,9 +13,7 @@ import com.reallyworld.rwmoonjourney.core.event.ChestService;
 import com.reallyworld.rwmoonjourney.core.event.EventService;
 import com.reallyworld.rwmoonjourney.core.event.MobService;
 import com.reallyworld.rwmoonjourney.core.event.PlayerService;
-import com.reallyworld.rwmoonjourney.listeners.CommandListener;
-import com.reallyworld.rwmoonjourney.listeners.MobKillListener;
-import com.reallyworld.rwmoonjourney.listeners.PlayerJoinListener;
+import com.reallyworld.rwmoonjourney.listeners.*;
 import lombok.extern.slf4j.Slf4j;
 import lombok.var;
 import net.milkbowl.vault.economy.Economy;
@@ -117,6 +115,8 @@ public final class RWMoonJourney extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(eventService), this);
         getServer().getPluginManager().registerEvents(new MobKillListener(economy), this);
         getServer().getPluginManager().registerEvents(new CommandListener(eventService), this);
+        getServer().getPluginManager().registerEvents(new PlayerLeaveListener(eventService, playerService), this);
+        getServer().getPluginManager().registerEvents(new PlayerDeathListener(eventService), this);
     }
 
     //of docks github code

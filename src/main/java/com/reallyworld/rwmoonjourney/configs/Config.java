@@ -118,6 +118,10 @@ public class Config extends ConfigBase {
         return config.getKeys(false);
     }
 
+    public static List<Integer> getIntList(String path){
+        return config.getIntegerList(path);
+    }
+
     public static void save(){
         try {
             config.save(configFile);

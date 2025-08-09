@@ -25,5 +25,6 @@ public class PlayerLeaveListener implements Listener {
             return;
 
         playerService.dropLoot(event.getPlayer());
+        eventService.remove(event.getPlayer());
     }
 }

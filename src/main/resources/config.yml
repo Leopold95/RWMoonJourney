@@ -6,12 +6,11 @@ startup-time:
 event-join-cost: 1000
 event-breath:
   cost: 1000
-  time-mm: 10
 
 breath-damage: 1.5 #урон от дыхания
 chests-to-spawn: 3 #сколько сундуков будет всего заспавнено на арене при начале ивента
-lobby-time-seconds: 10 #сколько времени будет длиться подготовка ивента в секундах
-event-duration-seconds: 30 #сколько ивент будет длиться в секундах
+lobby-time-seconds: 30 #сколько времени будет длиться подготовка ивента в секундах
+event-duration-seconds: 60 #сколько ивент будет длиться в секундах
 
 world:
   name: "event_world"
@@ -41,6 +40,12 @@ chest-rarity-list: #доступные редкости для сундуков,
   - rare:1000
   - default:6000
   - extra:9999
+
+lobby-pre-time-seconds:
+  - 5
+  - 10
+  - 15
+
 
 event-mobs:
   kill-money: 21.3

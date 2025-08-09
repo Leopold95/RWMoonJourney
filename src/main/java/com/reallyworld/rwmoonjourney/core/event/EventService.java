@@ -9,7 +9,6 @@ import lombok.var;
 import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
@@ -65,12 +64,13 @@ public class EventService {
 
     public void startJoining(){
         logger.info(Messages.message("logs.event.joining"));
-        plugin.getServer().sendMessage(Messages.text("event.joining"));
+        plugin.getServer().broadcast(Messages.text("event.joining"));
 
         eventState = EventState.Joining;
         players.clear();
 
         var lobbyTime = Config.getInt("lobby-time-seconds");
+        setupPreTimeNotifications();
         Bukkit.getScheduler().runTaskLater(plugin, this::start, lobbyTime * 20L);
     }
 
@@ -104,8 +104,13 @@ public class EventService {
      * Остановить событие
      */
     public void stop(){
+        if(eventState == EventState.Stopped){
+            logger.info(Messages.message("logs.event.already-stopped"));
+            return;
+        }
+
         logger.info(Messages.message("logs.event.stop"));
-        plugin.getServer().sendMessage(Messages.text("event.stop"));
+        plugin.getServer().broadcast(Messages.text("event.stop"));
 
         eventState = EventState.Stopped;
         isEventActive = false;
@@ -174,18 +179,13 @@ public class EventService {
      * @param player игрок
      */
     public void leave(@NotNull Player player){
-        remove(player);
-        player.sendMessage(Messages.getText("event.leave"));
-    }
+        if(!players.contains(player.getUniqueId())){
+            player.sendMessage(Messages.getText("event.leave.not-member"));
+            return;
+        }
 
-    /**
-     * Выгнать игрока с события
-     * @param player игрок, который кикает
-     * @param targetName ник того, кого кикнуть
-     * @param isSilent флаг тихого выкидывая
-     */
-    public void kick(@NotNull Player player, @NotNull String targetName, boolean isSilent){
-        player.getPersistentDataContainer().remove(Keys.IS_ON_EVENT);
+        remove(player);
+        player.sendMessage(Messages.getText("event.leave.ok"));
     }
 
     /**
@@ -194,8 +194,8 @@ public class EventService {
      */
     public void remove(@NotNull Player player){
         player.getPersistentDataContainer().remove(Keys.IS_ON_EVENT);
-        players.remove(player.getUniqueId());
         breathService.remove(player);
+        players.remove(player.getUniqueId());
     }
 
     public boolean isPlayerOnEvent(UUID playerId){
@@ -236,6 +236,19 @@ public class EventService {
         }
 
         breathService.add(player);
+    }
+
+    private void setupPreTimeNotifications(){
+        var list = Config.getIntList("lobby-pre-time-seconds");
+        var lobbyTime = Config.getInt("lobby-time-seconds");
+
+
+        for(var time: list){
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                var message = Messages.getString("event.pre-time").replace("{time}", String.valueOf(time));
+                Bukkit.broadcast(Component.text(message));
+            }, (lobbyTime - time) * 20L);
+        }
     }
 
     private void eventLoop(){
