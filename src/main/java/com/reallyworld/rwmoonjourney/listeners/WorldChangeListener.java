@@ -33,7 +33,7 @@ public class WorldChangeListener implements Listener {
         if(!event.getFrom().getName().equals(Config.getString("world.name")))
             return;
 
-//        playerService.dropLoot(event.getPlayer());
+        playerService.removeLoot(event.getPlayer());
         eventService.remove(event.getPlayer());
     }
 }

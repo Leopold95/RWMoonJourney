@@ -63,6 +63,14 @@ public class PlayerService {
     }
 
     /**
+     * Удаляет весь лут у игрока
+     * @param player игрок
+     */
+    public void removeLoot(@NotNull Player player){
+        player.getInventory().clear();
+    }
+
+    /**
      * Дропает лет игрока и очищает его инвентарь
      * @param player игрок
      */
