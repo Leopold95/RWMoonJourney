@@ -30,10 +30,6 @@ public class Messages extends ConfigBase {
 
     public static void init(Plugin plugin, String path) {
         configFile = new File(plugin.getDataFolder(), path);
-        try {
-            plugin.getLogger().info(String.valueOf(Files.readAllLines(configFile.toPath())));
-        }
-        catch (Exception ignored){}
         if (!configFile.exists()) {
             configFile.getParentFile().mkdirs();
             plugin.saveResource(path, false);

@@ -56,17 +56,18 @@ public final class RWMoonJourney extends JavaPlugin {
 
         playerService = new PlayerService();
         mobService = new MobService();
-        chestService = new ChestService(logger);
+        chestService = new ChestService(logger, mobService);
         breathService = new WaterBreathServiceImpl();
         eventService = new EventService(this, logger, economy, breathService, chestService, mobService, playerService);
-        eventTimer = new EventTimerService(eventService, plugin, logger);
+        eventTimer = new EventTimerService(eventService, this, logger);
         eventTimer.startTimer();
 
         printChestsCount();
-
         registerCommands();
         registerListeners();
 
+
+        mobService.removeAllCustomMobs(); //на всякий случай удалять мобов ивента при старте
         if(!checkBeforeEnable()){
             getServer().getPluginManager().disablePlugin(this);
         }

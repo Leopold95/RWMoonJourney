@@ -49,3 +49,5 @@ lobby-pre-time-seconds:
 
 event-mobs:
   kill-money: 21.3
+  per-chest: 2~5
+  spawn-spread-xz: 0~5.0

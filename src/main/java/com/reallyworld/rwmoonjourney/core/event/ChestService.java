@@ -23,9 +23,14 @@ import java.util.logging.Logger;
 @Slf4j
 public class ChestService {
     private final Logger logger;
+    private final MobService mobService;
 
-    public ChestService(Logger logger){
+    public ChestService(
+        @NotNull Logger logger,
+        @NotNull MobService mobService
+    ){
         this.logger = logger;
+        this.mobService = mobService;
     }
 
     private final int MAX_SLOT_INDEX = 27;
@@ -39,6 +44,7 @@ public class ChestService {
 
         for (var chest: chestsToSpawn()) {
             spawnChest(chest);
+            mobService.spawnMobs(chest.getLocation());
 
             var chestLoot = generateLoot(chest.getRarityCost()); //это надо заменить на кастомный генератор лута
             fillChest(getChestFromLocation(chest.getLocation()), chestLoot);

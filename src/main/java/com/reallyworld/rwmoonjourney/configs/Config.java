@@ -2,6 +2,7 @@ package com.reallyworld.rwmoonjourney.configs;
 
 import com.reallyworld.rwmoonjourney.api.config.BadConfigValueException;
 import com.reallyworld.rwmoonjourney.api.config.ConfigBase;
+import lombok.var;
 import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -15,6 +16,7 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.reallyworld.rwmoonjourney.RWMoonJourney.plugin;
 
@@ -122,6 +124,20 @@ public class Config extends ConfigBase {
         return config.getIntegerList(path);
     }
 
+    public static int getRandomInt(String path){
+        var splitted = config.getString(path).split("~");
+        var from = Integer.parseInt(splitted[0]);
+        var to = Integer.parseInt(splitted[1]);
+        return ThreadLocalRandom.current().nextInt(from, to) + 1;
+    }
+
+    public static double getRandomDouble(String path){
+        var splitted = config.getString(path).split("~");
+        var from = Double.parseDouble(splitted[0]);
+        var to = Double.parseDouble(splitted[1]);
+        return ThreadLocalRandom.current().nextDouble(from, to) + 1;
+    }
+
     public static void save(){
         try {
             config.save(configFile);
@@ -133,10 +149,6 @@ public class Config extends ConfigBase {
 
     public static void init(Plugin plugin, String path) {
         configFile = new File(plugin.getDataFolder(), path);
-        try {
-            plugin.getLogger().info(String.valueOf(Files.readAllLines(configFile.toPath())));
-        }
-        catch (Exception ignored){}
         if (!configFile.exists()) {
             configFile.getParentFile().mkdirs();
             plugin.saveResource(path, false);

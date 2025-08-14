@@ -16,6 +16,8 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -26,7 +28,7 @@ import java.util.logging.Logger;
  */
 public class EventService {
     private final Set<UUID> players = new ConcurrentSkipListSet<>();
-    private boolean isEventActive = false;
+    private final List<BukkitTask> pretimesList = new ArrayList<>();
 
     private long maxEventDuration = Config.getLong("event-duration-seconds");
     private long eventTimer = 0;
@@ -82,7 +84,6 @@ public class EventService {
         plugin.getServer().sendMessage(Messages.text("event.start"));
 
         eventState = EventState.Running;
-        isEventActive = true;
         chestService.respawnAll();
         eventTimer = 0;
 
@@ -113,7 +114,6 @@ public class EventService {
         plugin.getServer().broadcast(Messages.text("event.stop"));
 
         eventState = EventState.Stopped;
-        isEventActive = false;
         eventTimer = 0;
 
         for(var playerUuid: players){
@@ -134,6 +134,11 @@ public class EventService {
         }
 
         players.clear();
+        for(var task: pretimesList){
+            if(task != null && !task.isCancelled())
+                task.cancel();
+        }
+        mobService.removeAllCustomMobs();
 
         //TODO что делать с игроками, которые были на ивенте в момент его завершения
     }
@@ -249,10 +254,17 @@ public class EventService {
 
 
         for(var time: list){
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            var task = Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 var message = Messages.getString("event.pre-time").replace("{time}", String.valueOf(time));
-                Bukkit.broadcast(Component.text(message));
+                for(var pUuid: players){
+                    var player = Bukkit.getPlayer(pUuid);
+                    if(player == null || !player.isOnline())
+                        continue;
+
+                    player.sendMessage(Component.text(message));
+                }
             }, (lobbyTime - time) * 20L);
+            pretimesList.add(task);
         }
     }
 
