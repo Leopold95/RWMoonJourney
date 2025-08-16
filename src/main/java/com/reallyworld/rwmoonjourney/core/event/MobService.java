@@ -29,8 +29,7 @@ public class MobService {
 
         if(world == null)
             return;
-
-
+        
         for(var eventEntity: world.getEntities()){
             if(!isEventMob(eventEntity))
                 continue;
